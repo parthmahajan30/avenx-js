@@ -22,6 +22,27 @@ The second argument to `initRouter` is an optional `options` object that control
 | `titleSuffix`          | `string` | `''`        | A string appended to every resolved route title. Use this to add consistent branding, such as ` | MyCompany`.                                                                                                      |
 | `transition`           | `string` | `'none'`    | Enables a named transition effect (e.g. `'fade'`, `'slide'`) applied to the page container when navigating between routes.                                                                                        |
 | `scrollRestoration` | `'top' \| 'auto' \| 'manual'` | `'top'` | Controls window scroll behavior on route transitions. `'top'` scrolls to the top on every navigation, `'auto'` remembers and restores scroll positions, and `'manual'` leaves the current scroll position unchanged. |
+| `a11y` | `object` | See below | Configures route-change announcements and focus management. |
+
+#### Accessibility options (`a11y`)
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `focusOnNavigate` | `boolean` | `true` | Moves focus after successful route changes. The initial page load is skipped. |
+| `announceRouteChanges` | `boolean` | `true` | Announces the current document title through a polite `role="status"` live region after navigation. |
+| `focusTarget` | `string` | `'[data-ax-page-heading]'` | Selector searched inside the mounted page for the element that should receive focus. |
+
+If the configured selector does not match, focus management falls back to `[data-ax-page-heading]`, then to the mounted page container. A target without `tabindex` receives `tabindex="-1"`, and focus is applied with `preventScroll: true`.
+
+```javascript
+const router = AvenxApp.initRouter(routes, {
+  a11y: {
+    focusTarget: '[data-page-title]',
+  },
+});
+```
+
+See [Routing accessibility](/core-concepts/routing/#accessibility) for markup examples and route-announcement behavior.
 
 ```javascript
 const router = AvenxApp.initRouter(routes, {
