@@ -90,6 +90,54 @@ export default {
 ```
 
 
+## Accessibility
+
+AvenxRouter manages focus and route announcements after successful client-side navigation by default. This helps keyboard and screen-reader users understand that the visible page has changed even though the browser did not perform a full document load.
+
+The router uses these accessibility options:
+
+| Option | Type | Default | Behavior |
+| :--- | :--- | :--- | :--- |
+| `focusOnNavigate` | `boolean` | `true` | Moves focus after route changes. Focus is not moved on the initial page load, so first paint does not steal focus. |
+| `announceRouteChanges` | `boolean` | `true` | Announces the current document title through a visually hidden `role="status"` live region after navigation. |
+| `focusTarget` | `string` | `'[data-ax-page-heading]'` | CSS selector used to find the element that should receive focus inside the mounted page. |
+
+Mark the main heading of each page with `data-ax-page-heading` to use the default focus target:
+
+```html
+<main>
+  <h1 data-ax-page-heading>Account settings</h1>
+  <p>Update your profile and preferences here.</p>
+</main>
+```
+
+On navigation, the router looks for the configured `focusTarget` inside the mounted page. If no matching element is found, it falls back to `[data-ax-page-heading]`, and then to the page container itself. When the chosen target does not already have a `tabindex`, Avenx adds `tabindex="-1"` so non-interactive headings and containers can receive programmatic focus. Focus is applied with `preventScroll: true`.
+
+You can override the target through the router's `a11y` options:
+
+```javascript
+app.initRouter(routes, {
+  a11y: {
+    focusOnNavigate: true,
+    announceRouteChanges: true,
+    focusTarget: '[data-page-title]',
+  },
+});
+```
+
+The announcement region uses polite, atomic status updates. Avenx clears the region before writing the next title so navigating between two routes with the same title can still be announced twice.
+
+To disable one behavior without affecting the other:
+
+```javascript
+app.initRouter(routes, {
+  a11y: {
+    focusOnNavigate: false,
+    announceRouteChanges: true,
+  },
+});
+```
+
 ## 3. Dynamic Route Parameters
 
 Route segments starting with `:` are dynamic variables. The values parsed from the URL are automatically added to the Page component's `state` object and can be read inside templates or actions:
